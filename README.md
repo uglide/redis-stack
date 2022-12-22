@@ -71,6 +71,16 @@ invoke package -o macos -p redis-stack-server -s catalina -t zip -d catalina
 invoke package -o macos -p redis-stack-server -s monterey -t zip -d monterey -a arm64
 ```
 
+*Build redis-stack-cluster on M1*
+```bash
+invoke package -o Linux -p redis-stack-server -s ubuntu20.04 -t deb -d focal -a arm64
+cp redis-stack-server-99.99.99.focal.arm64.deb ./redis-stack
+invoke dockergen -p redis-stack-cluster
+invoke dockerbuild -a  arm64 -d envs/dockers/Dockerfile.redis-stack-cluster -t local_redis-stack_cluster -r . --load
+docker run -it -p 16379-16384:16379-16384 local_redis-stack_cluster
+```
+
+
 For more examples, see github workflows for how CI reuses invoke.
 
 ### Packaging

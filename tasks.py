@@ -1,3 +1,8 @@
+import inspect
+
+if not hasattr(inspect, 'getargspec'):
+    inspect.getargspec = inspect.getfullargspec
+
 from invoke import run, task
 import os
 import shutil
@@ -24,6 +29,7 @@ def dockerbuild(
     arch="x86_64",
     root=".",
     buildx_push=False,
+    load=True,
 ):
     """build the docker"""
     if arch == "x86_64":
@@ -38,6 +44,10 @@ def dockerbuild(
         cmd = f"docker buildx build --push --platform {platform} -f {dockerfile} -t {tag} {root}"
     else:
         cmd = f"docker buildx build --platform {platform} -f {dockerfile} -t {tag} {root}"
+
+    if load:
+        cmd = f"{cmd} --load --label local_redis_stack_cluster"
+
     sys.stderr.write("Building docker using the command: \n")
     sys.stderr.write(cmd)
     run(cmd)
